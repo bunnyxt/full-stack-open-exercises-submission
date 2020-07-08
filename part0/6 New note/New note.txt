@@ -1,0 +1,28 @@
+title 0.6: New note
+
+note over browser:
+user type in something in input form
+then click "Save" button
+end note
+
+note over browser:
+browser starts executing js-code
+that make new note = {"content":"<input-text>","date":"<input-date>"}
+end note
+
+note over browser:
+browser continues executing js-code
+add new note into notes
+end note
+
+note over browser:
+browser executes the event handler
+that renders notes to display
+end note
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa, Request Payload: "{"content":"<input-text>","date":"<input-date>"}"
+server-->browser: 201 Created, message: "note created"
+
+note over browser:
+console print "note created"
+end note
