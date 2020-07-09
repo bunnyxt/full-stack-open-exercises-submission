@@ -15,7 +15,7 @@ const Statistic = ({text, value}) => (
 const Statistics = ({good, neutral, bad}) => {
   const all = good + neutral + bad
   
-  if (all == 0) {
+  if (all === 0) {
     return (
       <div>
         <h1>statistics</h1>
