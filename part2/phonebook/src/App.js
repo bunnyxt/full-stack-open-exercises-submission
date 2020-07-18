@@ -29,14 +29,17 @@ const App = () => {
 
   const buttonClickHandler = (event) => {
     event.preventDefault();
-    let newPerson = persons.find(person => person.name === newName);
-    if (newPerson) {
+    const newPerson = {
+      name: newName,
+      number: newNumber
+    };
+    const personWithSameName = persons.find(person => person.name === newName);
+    if (personWithSameName) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        newPerson.number = newNumber;
         personService
-          .update(newPerson.id, newPerson)
+          .update(personWithSameName.id, newPerson)
           .then(returnedPerson => {
-            setPersons(persons.map(person => person.id !== newPerson.id ? person : returnedPerson));
+            setPersons(persons.map(person => person.id !== personWithSameName.id ? person : returnedPerson));
             setMessageType('success');
             setMessageText(`Successfully update ${newPerson.name}!`);
             setTimeout(() => {
@@ -47,17 +50,13 @@ const App = () => {
           })
           .catch(error => {
             setMessageType('error');
-            setMessageText(`Fail to update ${newPerson.name}! ${error}`);
+            setMessageText(`Fail to update ${newPerson.name}! ${error.response.data.error}`);
             setTimeout(() => {
               setMessageText(null);
             }, 2000)
           })
       }
     } else {
-      const newPerson = {
-        name: newName,
-        number: newNumber
-      };
       personService
         .create(newPerson)
         .then(returnedPerson => {
@@ -72,7 +71,7 @@ const App = () => {
         })
         .catch(error => {
           setMessageType('error');
-          setMessageText(`Fail to add ${newPerson.name}! ${error}`);
+          setMessageText(`Fail to add ${newPerson.name}! ${error.response.data.error}`);
           setTimeout(() => {
             setMessageText(null);
           }, 2000)
