@@ -4,9 +4,13 @@ const app = express()
 app.use(express.json())
 
 const morgan = require('morgan')
-
 morgan.token('content', (req, res) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
+
+const cors = require('cors')
+app.use(cors())
+
+app.use(express.static('build'))
 
 let persons = [
   {
@@ -84,7 +88,43 @@ app.post('/api/persons', (req, res) => {
   }
 })
 
-const port = 3001
+app.put('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const newPerson = req.body;
+  if (!newPerson.name) {
+    return res.status(400).json({ 
+      error: 'name missing' 
+    })
+  } 
+  if (!newPerson.number) {
+    return res.status(400).json({ 
+      error: 'number missing' 
+    })
+  }
+  if (newPerson.id !== id) {
+    return res.status(400).json({ 
+      error: 'new person id not equal to id in url' 
+    })
+  }
+
+  const oldPerson = persons.find(person => person.id === id);
+  if (oldPerson) {
+    for (let i = 0; i < persons.length; i++) {
+      if (persons[i].id === id) {
+        persons[i].name = newPerson.name;
+        persons[i].number = newPerson.number;
+        break;
+      }
+    }
+    res.json(newPerson);
+  } else {
+    return res.status(404).json({ 
+      error: `no person with id ${id}` 
+    })
+  }
+})
+
+const port = process.env.PORT || 3001
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
 })
