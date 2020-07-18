@@ -29,7 +29,7 @@ app.get('/info', (req, res) => {
     res.send(`
       <p>Phonebook has info for ${persons.length} people</p>
       <p>${new Date()}</p>`
-    );
+    )
   })
 })
 
@@ -60,7 +60,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
 })
 
 app.post('/api/persons', (req, res, next) => {
-  const body = req.body;
+  const body = req.body
 
   const newPreson = new Person({
     name: body.name,
@@ -75,7 +75,7 @@ app.post('/api/persons', (req, res, next) => {
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-  const body = req.body;
+  const body = req.body
 
   const newPerson = {
     name: body.name,
