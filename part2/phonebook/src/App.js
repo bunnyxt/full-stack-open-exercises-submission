@@ -91,7 +91,7 @@ const App = () => {
   const deleteButtonClickHandler = (event) => {
     event.preventDefault();
     const personName = event.target.name;
-    const personId = parseInt(event.target.id);
+    const personId = event.target.id;
     if (window.confirm(`Delete ${personName} ?`)) {
       personService
         .remove(event.target.id)
