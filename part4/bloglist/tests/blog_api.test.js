@@ -3,7 +3,9 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -12,6 +14,16 @@ beforeEach(async () => {
     let blogObject = new Blog(blog);
     await blogObject.save()
   }
+
+  await User.deleteMany({})
+  const saltRounds = 10
+  const passwordHash = await bcrypt.hash('passwd', saltRounds)
+  const user = new User({
+    username: 'bunnyxt',
+    name: 'bunnyxt',
+    passwordHash: passwordHash
+  })
+  await user.save()
 })
 
 test('blogs are returned as json', async () => {
@@ -33,6 +45,14 @@ test('all blogs have property id defined', async () => {
 })
 
 test('new blog can be added', async () => {
+  const loginResult = await api
+    .post('/api/login')
+    .send({
+      'username': 'bunnyxt',
+      'password': 'passwd'
+    })
+  const token = loginResult.body.token
+
   const newBlog = {
     title: 'bunnyxt\'s cheat sheet',
     author: 'bunnyxt',
@@ -42,6 +62,7 @@ test('new blog can be added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -56,6 +77,14 @@ test('new blog can be added', async () => {
 })
 
 test('new blog without property likes, set to default 0', async () => {
+  const loginResult = await api
+    .post('/api/login')
+    .send({
+      'username': 'bunnyxt',
+      'password': 'passwd'
+    })
+  const token = loginResult.body.token
+
   const newBlog = {
     title: 'bunnyxt\'s cheat sheet',
     author: 'bunnyxt',
@@ -65,6 +94,7 @@ test('new blog without property likes, set to default 0', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -76,6 +106,14 @@ test('new blog without property likes, set to default 0', async () => {
 })
 
 test('blog without title will not added', async () => {
+  const loginResult = await api
+    .post('/api/login')
+    .send({
+      'username': 'bunnyxt',
+      'password': 'passwd'
+    })
+  const token = loginResult.body.token
+
   const newBlog = {
     // title: 'bunnyxt\'s cheat sheet',
     author: 'bunnyxt',
@@ -85,6 +123,7 @@ test('blog without title will not added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
     .send(newBlog)
     .expect(400)
     .expect('Content-Type', /application\/json/)
@@ -95,6 +134,14 @@ test('blog without title will not added', async () => {
 })
 
 test('blog without url will not added', async () => {
+  const loginResult = await api
+    .post('/api/login')
+    .send({
+      'username': 'bunnyxt',
+      'password': 'passwd'
+    })
+  const token = loginResult.body.token
+
   const newBlog = {
     title: 'bunnyxt\'s cheat sheet',
     author: 'bunnyxt',
@@ -104,6 +151,7 @@ test('blog without url will not added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
     .send(newBlog)
     .expect(400)
     .expect('Content-Type', /application\/json/)
@@ -114,12 +162,35 @@ test('blog without url will not added', async () => {
 })
 
 test('delete blog by id', async () => {
-  const oriResponse = await api.get('/api/blogs')
-  const oriBlogs = oriResponse.body
-  const blogToBeDeleted = oriBlogs[0]
+  const loginResult = await api
+    .post('/api/login')
+    .send({
+      'username': 'bunnyxt',
+      'password': 'passwd'
+    })
+  const token = loginResult.body.token
+
+  const newBlog = {
+    title: 'bunnyxt\'s cheat sheet',
+    author: 'bunnyxt',
+    url: 'bcs.bunnyxt.com',
+    likes: 2
+  }
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const blogs = response.body
+  const blogToBeDeleted = blogs[blogs.length - 1]
 
   await api
     .delete(`/api/blogs/${blogToBeDeleted.id}`)
+    .set('Authorization', `bearer ${token}`)
     .expect(204)
 
   const afterDeleteResponse = await api.get('/api/blogs')
