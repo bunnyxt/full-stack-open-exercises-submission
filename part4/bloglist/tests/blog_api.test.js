@@ -75,7 +75,6 @@ test('new blog without property likes, set to default 0', async () => {
   expect(response.body[response.body.length - 1].likes).toEqual(0)
 })
 
-// add blog without title
 test('blog without title will not added', async () => {
   const newBlog = {
     // title: 'bunnyxt\'s cheat sheet',
@@ -95,7 +94,6 @@ test('blog without title will not added', async () => {
   expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
-// add blog without url
 test('blog without url will not added', async () => {
   const newBlog = {
     title: 'bunnyxt\'s cheat sheet',
@@ -113,6 +111,92 @@ test('blog without url will not added', async () => {
   const response = await api.get('/api/blogs')
 
   expect(response.body).toHaveLength(helper.initialBlogs.length)
+})
+
+test('delete blog by id', async () => {
+  const oriResponse = await api.get('/api/blogs')
+  const oriBlogs = oriResponse.body
+  const blogToBeDeleted = oriBlogs[0]
+
+  await api
+    .delete(`/api/blogs/${blogToBeDeleted.id}`)
+    .expect(204)
+
+  const afterDeleteResponse = await api.get('/api/blogs')
+  const afterDeleteBlogs = afterDeleteResponse.body
+  
+  expect(afterDeleteBlogs).toEqual(
+    expect.not.arrayContaining([blogToBeDeleted])
+  )
+})
+
+test('update blog by id', async () => {
+  const oriResponse = await api.get('/api/blogs')
+  const oriBlogs = oriResponse.body
+  const blogToBeUpdated = oriBlogs[0]
+  const newBlog = {
+    title: 'bunnyxt\'s cheat sheet',
+    author: 'bunnyxt',
+    url: 'bcs.bunnyxt.com',
+    likes: 2
+  }
+
+  const updatedResponse = await api
+    .put(`/api/blogs/${blogToBeUpdated.id}`)
+    .send(newBlog)
+    .expect(200)
+  const updatedBlog = updatedResponse.body
+
+  expect(updatedBlog).toMatchObject(newBlog)
+
+  const afterUpdateResponse = await api.get(`/api/blogs/${blogToBeUpdated.id}`)
+  const afterUpdateBlog = afterUpdateResponse.body
+  
+  expect(afterUpdateBlog).toMatchObject(newBlog)
+})
+
+test('update blog by id without title', async () => {
+  const oriResponse = await api.get('/api/blogs')
+  const oriBlogs = oriResponse.body
+  const blogToBeUpdated = oriBlogs[0]
+  const newBlog = {
+    // title: 'bunnyxt\'s cheat sheet',
+    author: 'bunnyxt',
+    url: 'bcs.bunnyxt.com',
+    likes: 2
+  }
+
+  await api
+    .put(`/api/blogs/${blogToBeUpdated.id}`)
+    .send(newBlog)
+    .expect(400)
+
+  const afterUpdateResponse = await api.get(`/api/blogs/${blogToBeUpdated.id}`)
+  const afterUpdateBlog = afterUpdateResponse.body
+  
+  expect(afterUpdateBlog).toMatchObject(blogToBeUpdated)
+})
+
+test('update blog by id without url', async () => {
+  const oriResponse = await api.get('/api/blogs')
+  const oriBlogs = oriResponse.body
+  const blogToBeUpdated = oriBlogs[0]
+  const newBlog = {
+    title: 'bunnyxt\'s cheat sheet',
+    author: 'bunnyxt',
+    // url: 'bcs.bunnyxt.com',
+    likes: 2
+  }
+
+  await api
+    .put(`/api/blogs/${blogToBeUpdated.id}`)
+    .send(newBlog)
+    .expect(400)
+
+  const afterUpdateResponse = await api.get(`/api/blogs/${blogToBeUpdated.id}`)
+  const afterUpdateBlog = afterUpdateResponse.body
+  
+  expect(afterUpdateBlog).toMatchObject(blogToBeUpdated)
 })
 
 afterAll(() => {
