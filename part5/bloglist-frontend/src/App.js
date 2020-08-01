@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -9,9 +12,6 @@ const App = () => {
   const [promptMessage, setPromptMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -58,25 +58,19 @@ const App = () => {
     setUser(null)
   }
 
-  const handleCreate = async (event) => {
-    event.preventDefault()
-    try {
-      const newBlog = await blogService.create({
-        title: newTitle, 
-        author: newAuthor, 
-        url: newUrl
-      })
+  const blogFormRef = useRef()
 
-      setBlogs(blogs.concat(newBlog))
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
+  const createBlog = async (blogObject) => {
+    try {
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedBlog))
 
       setPromptType('success')
-      setPromptMessage(`a new blog ${newBlog.title} added`)
+      setPromptMessage(`a new blog ${returnedBlog.title} added`)
       setTimeout(() => {
         setPromptMessage(null)
       }, 5000)
+      blogFormRef.current.toggleVisibility()
     } catch (exception) {
       setPromptType('error')
       setPromptMessage('fail to create new blog, please check input')
@@ -86,76 +80,13 @@ const App = () => {
     }
   }
 
-  const prompt = () => (
-    <div className={`prompt prompt-${promptType}`}>
-      {promptMessage}
-    </div>
-  )
-
-  const loginForm = () => (
-    <div>
-      <h2>log in to application</h2>
-      {promptMessage && prompt()}
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
-  )
-
   const blogsForm = () => (
     <div>
       <h2>blogs</h2>
-      {promptMessage && prompt()}
       <p>{user.name} logged in <button onClick={handleLogout} >logout</button></p>
-      <h2>create new</h2>
-      <form onSubmit={handleCreate}>
-        <div>
-          title:
-          <input
-            type="text"
-            value={newTitle}
-            name="title"
-            onChange={({ target }) => setNewTitle(target.value)}
-          />
-        </div>
-        <div>
-          author: 
-          <input
-            type="text"
-            value={newAuthor}
-            name="author"
-            onChange={({ target }) => setNewAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url: 
-          <input
-            type="text"
-            value={newUrl}
-            name="url"
-            onChange={({ target }) => setNewUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <BlogForm createBlog={createBlog} />
+      </Togglable>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
@@ -164,7 +95,24 @@ const App = () => {
 
   return (
     <div>
-      {user === null ? loginForm() : blogsForm()}
+      {
+        promptMessage && 
+        <div className={`prompt prompt-${promptType}`}>
+          {promptMessage}
+        </div>
+      }
+      {
+        user === null ?
+        <LoginForm 
+          handleSubmit={handleLogin}
+          handleUsernameChange={setUsername}
+          handlePasswordChange={setPassword}
+          username={username} 
+          password={password} 
+        /> 
+        :
+        blogsForm()
+      }
     </div>
   )
 }
