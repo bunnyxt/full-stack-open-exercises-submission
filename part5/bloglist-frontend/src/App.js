@@ -104,6 +104,26 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blogToDelete) => {
+    try {
+      await blogService.delete(blogToDelete.id)
+
+      setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+
+      setPromptType('success')
+      setPromptMessage(`blog ${blogToDelete.title} removed`)
+      setTimeout(() => {
+        setPromptMessage(null)
+      }, 5000)
+    } catch (exception) {
+      setPromptType('error')
+      setPromptMessage(`fail to remove blog ${blogToDelete.title}`)
+      setTimeout(() => {
+        setPromptMessage(null)
+      }, 5000)
+    }
+  }
+
   const blogsOrderByLikes = blogs.sort((a, b) => 
     b.likes - a.likes
   )
@@ -116,7 +136,7 @@ const App = () => {
         <BlogForm createBlog={createBlog} />
       </Togglable>
       {blogsOrderByLikes.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
       )}
     </div>
   )
