@@ -36,13 +36,13 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 
   return (
     <div style={blogStyle}>
-      <div style={hideWhenVisible}>
+      <div className='blog-content-less' style={hideWhenVisible}>
         {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
       </div>
-      <div style={showWhenVisible}>
+      <div className='blog-content-more' style={showWhenVisible}>
         <div>{blog.title} {blog.author} <button onClick={toggleVisibility}>hide</button></div>
         <div>{blog.url}</div>
-        <div>likes {blog.likes} <button onClick={plusBlogLike}>like</button></div>
+        <div>likes {blog.likes} <button className='like-button' onClick={plusBlogLike}>like</button></div>
         <div>{blog.user.name}</div>
         <div><button onClick={removeBlog}>remove</button></div>
       </div>
