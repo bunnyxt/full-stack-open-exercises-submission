@@ -9,16 +9,16 @@ const notificationReducer = (state = null, action) => {
   }
 }
 
-export const setNotification = (notification) => {
-  return {
-    type: 'SET_NOTIFICATION',
-    notification
-  }
-}
-
-export const clearNotification = () => {
-  return {
-    type: 'CLEAR_NOTIFICATION'
+export const setNotification = (notification, delay) => {
+  return async dispatch => {
+    dispatch({
+      type: 'SET_NOTIFICATION',
+      notification
+    })
+    await new Promise((resolve) => setTimeout(resolve, delay * 1000))
+    dispatch({
+      type: 'CLEAR_NOTIFICATION'
+    })
   }
 }
 
