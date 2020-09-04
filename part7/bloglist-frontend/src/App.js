@@ -12,7 +12,6 @@ import Notification from './components/Notification'
 import { initializeBlogs, createNewBlog, updateOldBlog, deleteOldBlog } from './reducers/blogReducer'
 
 const App = () => {
-  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -22,11 +21,6 @@ const App = () => {
     b.likes - a.likes
   )
 
-  // useEffect(() => {
-  //   blogService.getAll().then(blogs =>
-  //     setBlogs(blogs)
-  //   )
-  // }, [])
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
@@ -69,8 +63,6 @@ const App = () => {
 
   const createBlog = async (blogObject) => {
     try {
-      // const returnedBlog = await blogService.create(blogObject)
-      // setBlogs(blogs.concat(returnedBlog))
       dispatch(createNewBlog(blogObject))
       dispatch(setNotification(`a new blog ${blogObject.title} added`, 'success'))
       blogFormRef.current.toggleVisibility()
@@ -81,13 +73,6 @@ const App = () => {
 
   const updateBlog = async (id, blogObject) => {
     try {
-      // const returnedBlog = await blogService.update(id, blogObject)
-
-      // setBlogs(blogs.map(blog => 
-      //   blog.id === id 
-      //   ? { ...returnedBlog, user: blog.user } 
-      //   : blog)
-      // )
       dispatch(updateOldBlog(id, blogObject))
       dispatch(setNotification(`blog ${blogObject.title} updated`, 'success'))
     } catch (exception) {
@@ -97,19 +82,12 @@ const App = () => {
 
   const deleteBlog = async (blogToDelete) => {
     try {
-      // await blogService.delete(blogToDelete.id)
-
-      // setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
       dispatch(deleteOldBlog(blogToDelete.id))
       dispatch(setNotification(`blog ${blogToDelete.title} removed`, 'success'))
     } catch (exception) {
       dispatch(setNotification(`fail to remove blog ${blogToDelete.title}`, 'error'))
     }
   }
-
-  // const blogsOrderByLikes = blogs.sort((a, b) => 
-  //   b.likes - a.likes
-  // )
 
   const blogsForm = () => (
     <div>
@@ -118,11 +96,6 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <BlogForm createBlog={createBlog} />
       </Togglable>
-      {/* <div className='blogs'>
-        {blogsOrderByLikes.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
-        )}
-      </div> */}
       <div>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
