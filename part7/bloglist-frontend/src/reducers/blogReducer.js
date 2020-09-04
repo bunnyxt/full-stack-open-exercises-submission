@@ -1,4 +1,5 @@
 import blogService from '../services/blogs'
+import { setNotification } from './notificationReducer'
 
 const blogReducer = (state = [], action) => {
   switch (action.type) {
@@ -22,46 +23,62 @@ const blogReducer = (state = [], action) => {
 
 export const initializeBlogs = () => {
   return async dispatch => {
-    const anecdotes = await blogService.getAll()
+    const blogs = await blogService.getAll()
     dispatch({
       type: 'INIT_BLOGS',
-      data: anecdotes,
+      data: blogs,
     })
   }
 }
 
 export const createNewBlog = (blogObject) => {
   return async dispatch => {
-    const newBlog = await blogService.create(blogObject)
-    dispatch({
-      type: 'NEW_BLOG',
-      data: newBlog,
-    })
+    try {
+      const newBlog = await blogService.create(blogObject)
+      dispatch({
+        type: 'NEW_BLOG',
+        data: newBlog,
+      })
+      // TODO 清空title author url
+      dispatch(setNotification(`a new blog ${newBlog.title} added`, 'success'))
+    } catch (e) {
+      dispatch(setNotification('fail to create new blog, please check input', 'error'))
+    }
   }
 }
 
 export const updateOldBlog = (id, blogObject) => {
   return async dispatch => {
-    const returnedBlog = await blogService.update(id, blogObject)
-    dispatch({
-      type: 'UPDATE_BLOG',
-      data: {
-        id,
-        returnedBlog,
-      },
-    })
+    try {
+      const returnedBlog = await blogService.update(id, blogObject)
+      dispatch({
+        type: 'UPDATE_BLOG',
+        data: {
+          id,
+          returnedBlog,
+        },
+      })
+      dispatch(setNotification(`blog ${returnedBlog.title} updated`, 'success'))
+    } catch (e) {
+      dispatch(setNotification(`fail to update blog ${blogObject.title}, please check input`, 'error'))
+    }
   }
 }
 
-export const deleteOldBlog = (id) => {
+export const deleteOldBlog = (blogToDelete) => {
   return async dispatch => {
-    await blogService.delete(id)
-    dispatch({
-      type: 'DELETE_BLOG',
-      data: {
-        id,
-      }
-    })
+    try {
+      await blogService.delete(blogToDelete.id)
+      dispatch({
+        type: 'DELETE_BLOG',
+        data: {
+          id: blogToDelete.id,
+        }
+      })
+      dispatch(setNotification(`blog ${blogToDelete.title} removed`, 'success'))
+    } catch (e) {
+      dispatch(setNotification(`fail to remove blog ${blogToDelete.title}`, 'error'))
+    } 
   }
 }
 
