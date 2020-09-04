@@ -3,11 +3,10 @@ import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
-import blogService from './services/blogs'
 
 import { useDispatch, useSelector } from 'react-redux'
 import Notification from './components/Notification'
-import { initializeBlogs, createNewBlog, updateOldBlog, deleteOldBlog, addBlogComment } from './reducers/blogReducer'
+import { initializeBlogs, createNewBlog, updateOldBlog, addBlogComment } from './reducers/blogReducer'
 import { loadFromLocalStorage, userLogin, userLogout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
 
@@ -16,6 +15,8 @@ import {
   Switch, Route, Link, 
   useParams
 } from "react-router-dom"
+
+import { Table, Navbar, Nav, Button } from 'react-bootstrap'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -53,10 +54,6 @@ const App = () => {
 
   const updateBlog = (id, blogObject) => {
     dispatch(updateOldBlog(id, blogObject))
-  }
-
-  const deleteBlog = (blogToDelete) => {
-    dispatch(deleteOldBlog(blogToDelete))
   }
 
   const UserDetail = ({ users }) => {
@@ -107,12 +104,12 @@ const App = () => {
     return (
       <div>
         <h2>{blog.title} {blog.author}</h2>
-        <div><a href={blog.url} target="_blank">{blog.url}</a></div>
-        <div>likes {blog.likes} <button className='like-button' onClick={plusBlogLike}>like</button></div>
+        <div><a href={blog.url}>{blog.url}</a></div>
+        <div>likes {blog.likes} <Button className='like-button' onClick={plusBlogLike}>like</Button></div>
         <div>added by {blog.user.name}</div>
         <h3>comments</h3>
         <input type="text" value={comment} onChange={({ target }) => setComment(target.value)} />
-        <button onClick={addComment} >add comment</button>
+        <Button onClick={addComment} >add comment</Button>
         <ul>
           {blog.comments.map(comment =>
             <li key={comment.id}>{comment.content}</li>
@@ -124,9 +121,25 @@ const App = () => {
 
   const blogsForm = () => (
     <div>
-      <div className="nav">
-        <Link to="/">blogs</Link> <Link to="/users">users</Link> {user.name} logged in <button onClick={handleLogout} >logout</button>
-      </div>
+      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="mr-auto">
+          <Nav.Link href="#" as="span">
+            <Link to="/">blogs</Link>
+          </Nav.Link>
+          <Nav.Link href="#" as="span">
+            <Link to="/users">users</Link>
+          </Nav.Link>
+          <Nav.Link href="#" as="span">
+            {user.name} logged in
+          </Nav.Link>
+          <Nav.Link href="#" as="span">
+            <Button onClick={handleLogout} >logout</Button>
+          </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
       <h2>blog app</h2>
       <Switch>
         <Route path="/users/:id">
@@ -134,7 +147,7 @@ const App = () => {
         </Route>
         <Route path="/users">
           <h2>Users</h2>
-          <table>
+          <Table striped>
             <thead>
               <tr>
                 <td></td>
@@ -146,7 +159,7 @@ const App = () => {
                 <tr key={user.id}><td><Link to={`/users/${user.id}`}>{user.name}</Link></td><td>{user.blogs.length}</td></tr>
               )}
             </tbody>
-          </table>
+          </Table>
         </Route>
         <Route path="/blogs/:id">
           <BlogDetail blogs={blogs} updateBlog={updateBlog} />
@@ -156,9 +169,19 @@ const App = () => {
             <BlogForm createBlog={createBlog} />
           </Togglable>
           <div>
-            {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog} />
-            )}
+            <Table striped>
+              <thead>
+                <tr>
+                  <td>title</td>
+                  <td>author</td>
+                </tr>
+              </thead>
+              <tbody>
+                {blogs.map(blog =>
+                  <Blog key={blog.id} blog={blog} />
+                )}
+              </tbody>
+            </Table>
           </div>
         </Route>
       </Switch>
@@ -167,7 +190,7 @@ const App = () => {
 
   return (
     <Router>
-      <div>
+      <div className="container">
         <Notification />
         {
           user === null ?

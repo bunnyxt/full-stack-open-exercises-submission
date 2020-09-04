@@ -17,15 +17,6 @@ const blogReducer = (state = [], action) => {
     case 'DELETE_BLOG':
       return state.filter(blog => blog.id !== action.data.id)
     case 'ADD_COMMENT':
-      // return state.map(
-      //   blog => 
-      //   blog.id === action.data.id 
-      //   ? { ...action.data.returnedBlog, comments: blog.comments.concat({
-      //     id: action.data.id,
-      //     content: action.data.comment
-      //   }) } 
-      //   : blog
-      // )
       return state.map(
         blog => 
         blog.id === action.data.id 
