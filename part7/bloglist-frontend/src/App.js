@@ -107,8 +107,9 @@ const App = () => {
 
   const blogsForm = () => (
     <div>
-      <h2>blogs</h2>
-      <p>{user.name} logged in <button onClick={handleLogout} >logout</button></p>
+      <div className="nav">
+        <Link to="/">blogs</Link> <Link to="/users">users</Link> {user.name} logged in <button onClick={handleLogout} >logout</button>
+      </div>
       <Switch>
         <Route path="/users/:id">
           <UserDetail users={users} />
