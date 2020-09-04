@@ -39,8 +39,8 @@ export const createNewBlog = (blogObject) => {
         type: 'NEW_BLOG',
         data: newBlog,
       })
-      // TODO 清空title author url
       dispatch(setNotification(`a new blog ${newBlog.title} added`, 'success'))
+      // TODO set input text to null
     } catch (e) {
       dispatch(setNotification('fail to create new blog, please check input', 'error'))
     }

@@ -41,6 +41,7 @@ export const userLogin = (username, password) => {
         type: 'LOG_IN',
         data: user
       })
+      // TODO set input text to null
     } catch (e) {
       dispatch(setNotification('wrong username or password', 'error'))
     }
