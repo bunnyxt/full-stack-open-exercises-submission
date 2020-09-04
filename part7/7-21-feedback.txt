@@ -1,0 +1,12 @@
+Pros:
+- Well organized full-stack knowledge and carefully designed guidelines.
+- Progressive exercises, that is so great and impressive!
+- Advanced web knowledge, framework and many new things.
+- Enjoyable web UI.
+
+Cons:
+- Too many translation mistakes in Chinese, especially in part 6, 7.
+- Redux is quite difficult for me! Hoping this part will be better described.
+
+Thanks to all staff!
+Jinyuan Liu, 2020-09-05 in Beijing China
