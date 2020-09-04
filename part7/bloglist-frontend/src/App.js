@@ -3,10 +3,11 @@ import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import blogService from './services/blogs'
 
 import { useDispatch, useSelector } from 'react-redux'
 import Notification from './components/Notification'
-import { initializeBlogs, createNewBlog, updateOldBlog, deleteOldBlog } from './reducers/blogReducer'
+import { initializeBlogs, createNewBlog, updateOldBlog, deleteOldBlog, addBlogComment } from './reducers/blogReducer'
 import { loadFromLocalStorage, userLogin, userLogout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
 
@@ -79,6 +80,8 @@ const App = () => {
   }
 
   const BlogDetail = ({ blogs, updateBlog }) => {
+    const [comment, setComment] = useState('')
+
     const id = useParams().id
     const blog = blogs.find(n => n.id === String(id))
     if (!blog) {
@@ -95,12 +98,26 @@ const App = () => {
       })
     }
 
+    const addComment = () => {
+      dispatch(addBlogComment(blog.id, {
+        content: comment,
+      }))
+    }
+
     return (
       <div>
         <h2>{blog.title} {blog.author}</h2>
         <div><a href={blog.url} target="_blank">{blog.url}</a></div>
         <div>likes {blog.likes} <button className='like-button' onClick={plusBlogLike}>like</button></div>
         <div>added by {blog.user.name}</div>
+        <h3>comments</h3>
+        <input type="text" value={comment} onChange={({ target }) => setComment(target.value)} />
+        <button onClick={addComment} >add comment</button>
+        <ul>
+          {blog.comments.map(comment =>
+            <li key={comment.id}>{comment.content}</li>
+          )}
+        </ul>
       </div>
     )
   }
@@ -110,6 +127,7 @@ const App = () => {
       <div className="nav">
         <Link to="/">blogs</Link> <Link to="/users">users</Link> {user.name} logged in <button onClick={handleLogout} >logout</button>
       </div>
+      <h2>blog app</h2>
       <Switch>
         <Route path="/users/:id">
           <UserDetail users={users} />
