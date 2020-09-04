@@ -6,13 +6,19 @@ import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+import { useDispatch } from 'react-redux'
+import { setNotification } from './reducers/notificationReducer'
+import Notification from './components/Notification'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [promptType, setPromptType] = useState('success')
-  const [promptMessage, setPromptMessage] = useState(null)
+  // const [promptType, setPromptType] = useState('success')
+  // const [promptMessage, setPromptMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -44,11 +50,12 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setPromptType('error')
-      setPromptMessage('wrong username or password')
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('error')
+      // setPromptMessage('wrong username or password')
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification('wrong username or password', 'error'))
     }
   }
 
@@ -65,18 +72,20 @@ const App = () => {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
 
-      setPromptType('success')
-      setPromptMessage(`a new blog ${returnedBlog.title} added`)
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('success')
+      // setPromptMessage(`a new blog ${returnedBlog.title} added`)
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification(`a new blog ${returnedBlog.title} added`, 'success'))
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
-      setPromptType('error')
-      setPromptMessage('fail to create new blog, please check input')
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('error')
+      // setPromptMessage('fail to create new blog, please check input')
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification('fail to create new blog, please check input', 'error'))
     }
   }
 
@@ -90,17 +99,19 @@ const App = () => {
         : blog)
       )
 
-      setPromptType('success')
-      setPromptMessage(`blog ${returnedBlog.title} updated`)
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('success')
+      // setPromptMessage(`blog ${returnedBlog.title} updated`)
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification(`blog ${returnedBlog.title} updated`, 'success'))
     } catch (exception) {
-      setPromptType('error')
-      setPromptMessage(`fail to update blog ${blogObject.title}, please check input`)
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('error')
+      // setPromptMessage(`fail to update blog ${blogObject.title}, please check input`)
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification(`fail to update blog ${blogObject.title}, please check input`, 'error'))
     }
   }
 
@@ -110,17 +121,19 @@ const App = () => {
 
       setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
 
-      setPromptType('success')
-      setPromptMessage(`blog ${blogToDelete.title} removed`)
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('success')
+      // setPromptMessage(`blog ${blogToDelete.title} removed`)
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification(`blog ${blogToDelete.title} removed`, 'success'))
     } catch (exception) {
-      setPromptType('error')
-      setPromptMessage(`fail to remove blog ${blogToDelete.title}`)
-      setTimeout(() => {
-        setPromptMessage(null)
-      }, 5000)
+      // setPromptType('error')
+      // setPromptMessage(`fail to remove blog ${blogToDelete.title}`)
+      // setTimeout(() => {
+      //   setPromptMessage(null)
+      // }, 5000)
+      dispatch(setNotification(`fail to remove blog ${blogToDelete.title}`, 'error'))
     }
   }
 
@@ -145,12 +158,13 @@ const App = () => {
 
   return (
     <div>
-      {
+      {/* {
         promptMessage && 
         <div className={`prompt prompt-${promptType}`}>
           {promptMessage}
         </div>
-      }
+      } */}
+      <Notification />
       {
         user === null ?
         <LoginForm 
